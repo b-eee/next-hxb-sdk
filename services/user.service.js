@@ -3,9 +3,7 @@ import getConfig from 'next/config';
 import Router from 'next/router';
 import {createClient} from '@hexabase/hexabase-js' 
 
-const { publicRuntimeConfig } = getConfig();
-// const baseUrl = `${publicRuntimeConfig.apiUrl}`;
-const baseUrl = `https://hxb-graph.hexabase.com/graphql`
+const baseUrl = `${process.env.URL}`;
 const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user')));
 export const userService = {
     user: userSubject.asObservable(),
