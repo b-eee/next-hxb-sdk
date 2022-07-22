@@ -3,9 +3,7 @@ import getConfig from 'next/config';
 import Router from 'next/router';
 import {createClient} from '@hexabase/hexabase-js' 
 
-const { publicRuntimeConfig } = getConfig();
-// const baseUrl = `${publicRuntimeConfig.apiUrl}`;
-const baseUrl = `https://hxb-graph.hexabase.com/graphql`
+const baseUrl = `${process.env.URL}`;
 export const itemService = {
     getItems,
     getItemDetail
