@@ -23,6 +23,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
 import { appService } from "../../services/application.service";
 import Item from "../../components/Item";
+import AddProject from "../../components/modals/AddProject";
 
 const baseUrl = "https://hxb-graph.hexabase.com/graphql";
 
@@ -33,10 +34,10 @@ const WorkspaceDetail = (props) => {
   const [datastores, setDatastores] = useState([]);
   const [selectedDs, setSelectedDs] = useState();
   const [openAddProjectModal, setOpenAddProjectModal] = useState(false);
+  const [isChange, setIsChange] = useState(false);
 
   const router = useRouter();
   const { wsId } = router.query;
-  console.log({ wsId });
 
   const Content = styled(Box)`
     min-height: calc(100vh - 80px);
@@ -63,16 +64,16 @@ const WorkspaceDetail = (props) => {
 
   const getAppAndDs = async () => {
     const result = await appService.getAppAndDs(wsId);
-    console.log({ result });
     if (result) {
       setProjects(result);
+      setIsChange(false);
     }
   };
 
   useEffect(() => {
     getAppAndDs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wsId]);
+  }, [wsId, isChange]);
 
   useEffect(() => {
     const result = projects?.filter(
@@ -158,6 +159,12 @@ const WorkspaceDetail = (props) => {
           {selectedDs && <Item datastore={selectedDs} projectId={projectId} />}
         </RightContainer>
       </Content>
+      <AddProject
+        open={openAddProjectModal}
+        setOpen={setOpenAddProjectModal}
+        setIsChange={setIsChange}
+        getAppAndDs={getAppAndDs}
+      />
     </div>
   );
 };

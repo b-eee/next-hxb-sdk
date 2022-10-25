@@ -7,6 +7,9 @@ const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${process.env.URL}`;
 export const appService = {
   getAppAndDs,
+  getTemplates,
+  createApp,
+  getApplication,
 };
 
 async function getAppAndDs(id) {
