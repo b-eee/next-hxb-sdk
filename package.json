@@ -9,8 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@hexabase/hexabase-js": "^1.0.7",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@hexabase/hexabase-js": "^1.0.17",
     "@hookform/resolvers": "^2.8.8",
+    "@mui/icons-material": "^5.10.9",
+    "@mui/material": "^5.10.10",
     "next": "12.1.4",
     "prop-types": "^15.8.1",
     "react": "18.0.0",
