@@ -6,10 +6,12 @@ import {
   IconButton,
   InputLabel,
   List,
+  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Popover,
   Select,
   SelectChangeEvent,
   Stack,
@@ -24,6 +26,8 @@ import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
 import { appService } from "../../services/application.service";
 import Item from "../../components/Item";
 import AddProject from "../../components/modals/AddProject";
+import EditProject from "../../components/modals/EditProject";
+import UpdateItem from "../../components/modals/UpdateItem";
 
 const baseUrl = "https://hxb-graph.hexabase.com/graphql";
 
@@ -34,7 +38,13 @@ const WorkspaceDetail = (props) => {
   const [datastores, setDatastores] = useState([]);
   const [selectedDs, setSelectedDs] = useState();
   const [openAddProjectModal, setOpenAddProjectModal] = useState(false);
+  const [openEditProjectModal, setOpenEditProjectModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState("");
   const [isChange, setIsChange] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const openPopover = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   const router = useRouter();
   const { wsId } = router.query;
@@ -100,6 +110,19 @@ const WorkspaceDetail = (props) => {
     setOpenAddProjectModal(true);
   };
 
+  const handleClickEditProjectIcon = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClickEditProject = () => {
+    setOpenEditProjectModal(true);
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <div className="card">
       <Content>
@@ -128,7 +151,33 @@ const WorkspaceDetail = (props) => {
                     ))}
                 </Select>
               </FormControl>
-              <MoreVertOutlinedIcon />
+              <IconButton
+                aria-aria-describedby={id}
+                onClick={handleClickEditProjectIcon}
+              >
+                <MoreVertOutlinedIcon />
+              </IconButton>
+              <Popover
+                id={id}
+                open={openPopover}
+                anchorEl={openPopover}
+                anchorReference="anchorPosition"
+                anchorPosition={{ top: 220, left: 400 }}
+                onClose={handleClose}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+              >
+                <List>
+                  <ListItem sx={{ padding: 0 }}>
+                    <ListItemButton onClick={handleClickEditProject}>
+                      Update
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              </Popover>
             </RowContainer>
             <Stack direction="column">
               <ListItemButton onClick={handleButtonClick}>
@@ -165,6 +214,19 @@ const WorkspaceDetail = (props) => {
         setIsChange={setIsChange}
         getAppAndDs={getAppAndDs}
       />
+      <EditProject
+        open={openEditProjectModal}
+        setOpen={setOpenEditProjectModal}
+      />
+      {/* {selectedDs && selectedItemId && (
+        <UpdateItem
+          open={openUpdateItemModal}
+          selectedItemId={selectedItemId}
+          setOpen={setOpenUpdateItemModal}
+          datastore={selectedDs}
+          projectId={projectId}
+        />
+      )} */}
     </div>
   );
 };

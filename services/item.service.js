@@ -8,6 +8,7 @@ export const itemService = {
   getItems,
   getItemDetail,
   getFields,
+  updateItem,
 };
 
 async function getItems(datastoreId, projectId, getItemsParameters) {
@@ -39,4 +40,16 @@ async function getFields(datastoreId, projectId) {
     projectId
   );
   return dsFields;
+}
+
+async function updateItem(projectId, datastoreId, itemId, payload) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const hexabase = await createClient({ url: baseUrl, token: user.token });
+  const { data, error } = await hexabase.items.update(
+    projectId,
+    datastoreId,
+    itemId,
+    payload
+  );
+  return data;
 }

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import {
   IconButton,
@@ -9,15 +10,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import { Box } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import { useEffectOnce } from "../hooks/useEffectOnce";
 import { itemService } from "../services/item.service";
-import ItemDetail from "./ItemDetail";
-import StatusAction from "./StatusAction";
+import { datastoreService } from "../services/datastore.service";
+import UpdateItem from "./modals/UpdateItem";
 
 const Wrapper = styled(Box)`
   display: flex;
@@ -38,15 +36,6 @@ const BodyContainer = styled(Box)`
   display: flex;
   min-height: calc(100vh - 60px - 64px - 20px);
 `;
-const ItemDetailContainer = styled.div`
-  display: none;
-  background-color: #ffffff;
-  border-left: 1px solid #eeeeee;
-  transition: all 0.2s;
-  position: relative;
-
-  ${({ active }) => active && `display: flex`}
-`;
 
 const ItemDetailList = styled(Box)`
   display: flex;
@@ -59,11 +48,10 @@ const Item = ({ datastore, projectId }) => {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState();
   const [fields, setFields] = useState();
-  const [activeItemDetail, setActiveItemDetail] = useState(false);
-  const [fieldValues, setFieldValues] = useState();
-  const [selectedItemId, setSelectedItemId] = useState("");
-  const [itemActions, setItemActions] = useState([]);
-  const [selectedAction, setSelectedAction] = useState("");
+  const [itemId, setItemId] = useState("");
+  const [action, setAction] = useState([]);
+
+  const [openUpdateItemModal, setOpenUpdateItemModal] = useState(false);
 
   const { datastore_id } = datastore;
 
@@ -88,70 +76,32 @@ const Item = ({ datastore, projectId }) => {
 
   const getFields = async () => {
     const res = await itemService.getFields(datastore_id, projectId);
-    const idArray = Object.keys(res?.fields);
-    idArray.map((item) =>
-      itemFields.push({
-        title: res?.fields[item].name,
-        data_type: res?.fields[item].dataType,
-        field_id: res?.fields[item].field_id,
-        display_id: res?.fields[item].display_id,
-      })
-    );
-    setFields(itemFields);
+    if (res) {
+      const idArray = Object.keys(res?.fields);
+      idArray.map((item) =>
+        itemFields.push({
+          title: res?.fields[item].name,
+          data_type: res?.fields[item].dataType,
+          field_id: res?.fields[item].field_id,
+          display_id: res?.fields[item].display_id,
+          as_title: res?.fields[item].as_title,
+          unique: res?.fields[item].unique,
+        })
+      );
+      setFields(itemFields);
+    }
   };
 
-  const getItemDetail = async (
-    datastore_id,
-    itemId,
-    projectId,
-    itemDetailParams
-  ) => {
-    const res = await itemService.getItemDetail(
-      datastore_id,
-      itemId,
-      projectId,
-      itemDetailParams
-    );
-
-    let actions;
-    if (res && res?.item_actions) {
-      actions = Object.entries(res && res?.item_actions).map((item) => item[1]);
-    }
-
-    setItemActions(actions);
-
-    let arr;
-    if (res && res?.field_values) {
-      arr = Object.entries(res && res?.field_values).map((item) => item[1]);
-    }
-    setFieldValues(arr);
+  const getActions = async () => {
+    const res = await datastoreService.getActions(datastore_id);
+    setAction(res[0]);
   };
-
-  useEffect(() => {
-    const itemDetailParams = {
-      include_lookups: true,
-      use_display_id: true,
-      return_number_value: true,
-      format: "",
-      include_linked_items: true,
-    };
-
-    getItemDetail(datastore_id, selectedItemId, projectId, itemDetailParams);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedItemId]);
 
   useEffect(() => {
     getItems();
+    getActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [datastore_id, projectId]);
-
-  const handleClickItemRow = (itemId) => {
-    setSelectedItemId(itemId);
-  };
-
-  const handleActiveItemDetail = () => {
-    setActiveItemDetail(true);
-  };
 
   return (
     <Wrapper>
@@ -177,8 +127,8 @@ const Item = ({ datastore, projectId }) => {
                     hover
                     sx={{ cursor: "pointer" }}
                     onClick={() => {
-                      handleClickItemRow(item.i_id);
-                      handleActiveItemDetail();
+                      setItemId(item.i_id);
+                      setOpenUpdateItemModal(true);
                     }}
                   >
                     {fields &&
@@ -194,37 +144,20 @@ const Item = ({ datastore, projectId }) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <ItemDetailContainer active={activeItemDetail}>
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: "5px",
-              right: "10px",
-              zIndex: 2,
-            }}
-            aria-label="close"
-            onClick={() => setActiveItemDetail(false)}
-          >
-            <CloseIcon />
-          </IconButton>
-          <ItemDetailList>
-            <ItemDetail
-              fieldValues={fieldValues}
-              selectedAction={selectedAction}
-              datastoreId={datastore_id}
-              itemId={selectedItemId}
-              projectId={projectId}
-            />
-          </ItemDetailList>
-          <StatusAction
-            itemActions={itemActions}
-            setSelectedAction={setSelectedAction}
-            selectedAction={selectedAction}
-          />
-        </ItemDetailContainer>
       </BodyContainer>
+      {datastore && fields && (
+        <UpdateItem
+          open={openUpdateItemModal}
+          fields={fields}
+          selectedItemId={itemId}
+          setOpen={setOpenUpdateItemModal}
+          datastore={datastore}
+          projectId={projectId}
+          action={action}
+        />
+      )}
     </Wrapper>
   );
 };
 
-export default Item;
+export default React.memo(Item);

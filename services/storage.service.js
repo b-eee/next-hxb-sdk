@@ -10,7 +10,7 @@ export const storageService = {
 async function createFile(uploadFilePayload) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { data } = hexabase.storage.createFile(uploadFilePayload);
+  const data = await hexabase.storage.createFile(uploadFilePayload);
   return data;
 }
 // get detail datastore_item

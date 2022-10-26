@@ -163,45 +163,6 @@ function Workspaces() {
       </div>
       <hr />
       <div>
-        {/* <table className="table-body">
-          <thead>
-            <tr>
-              <th>application id</th>
-              <th>display id</th>
-              <th>name</th>
-              <th>datastores</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appDs &&
-              appDs.map((as) => {
-                return (
-                  <tr>
-                    <td>{as.application_id}</td>
-                    <td>{as.display_id}</td>
-                    <td>{as.name}</td>
-                    <td>
-                      {as.datastores &&
-                        as.datastores.map((ds) => {
-                          return (
-                            <ul>
-                              <li>
-                                <Link
-                                  href={`${url}/pj/${as.application_id}/ds/${ds.datastore_id}`}
-                                >
-                                  {ds.name}
-                                </Link>
-                                : {ds.datastore_id}
-                              </li>
-                            </ul>
-                          );
-                        })}
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table> */}
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
             {appDs && (
