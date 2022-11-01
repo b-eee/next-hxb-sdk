@@ -10,12 +10,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Box,
+  Button,
 } from "@mui/material";
-import { Box } from "@mui/material";
 import { useEffectOnce } from "../hooks/useEffectOnce";
 import { itemService } from "../services/item.service";
 import { datastoreService } from "../services/datastore.service";
 import UpdateItem from "./modals/UpdateItem";
+import { Spinner } from ".";
+import AddItem from "./modals/AddItem";
 
 const Wrapper = styled(Box)`
   display: flex;
@@ -30,18 +33,12 @@ const Header = styled(Box)`
   align-items: center;
   background-color: rgb(241, 241, 241);
   border-bottom: 1px solid #eeeeee;
+  justify-content: space-between;
 `;
 
 const BodyContainer = styled(Box)`
   display: flex;
   min-height: calc(100vh - 60px - 64px - 20px);
-`;
-
-const ItemDetailList = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  padding: 0 20px;
-  border-right: 1px solid #eeeeee;
 `;
 
 const Item = ({ datastore, projectId }) => {
@@ -50,7 +47,7 @@ const Item = ({ datastore, projectId }) => {
   const [fields, setFields] = useState();
   const [itemId, setItemId] = useState("");
   const [action, setAction] = useState([]);
-
+  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
   const [openUpdateItemModal, setOpenUpdateItemModal] = useState(false);
 
   const { datastore_id } = datastore;
@@ -103,61 +100,84 @@ const Item = ({ datastore, projectId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [datastore_id, projectId]);
 
-  return (
-    <Wrapper>
-      <Header>{datastore.name}</Header>
-      <BodyContainer>
-        <TableContainer component={Paper} sx={{ flex: 1 }}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                {fields &&
-                  fields
-                    .filter((i) => i.data_type !== "file")
-                    .map((item) => (
-                      <TableCell key={item.field_id}>{item.title}</TableCell>
-                    ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items &&
-                items.map((item) => (
-                  <TableRow
-                    key={item.i_id}
-                    hover
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setItemId(item.i_id);
-                      setOpenUpdateItemModal(true);
-                    }}
-                  >
-                    {fields &&
-                      fields
-                        .filter((i) => i.data_type !== "file")
-                        .map((field) => (
-                          <TableCell key={field.field_id}>
-                            {item[field.field_id]}
-                          </TableCell>
-                        ))}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </BodyContainer>
-      {datastore && fields && (
-        <UpdateItem
-          open={openUpdateItemModal}
+  if (loading) {
+    return <Spinner />;
+  } else {
+    return (
+      <Wrapper>
+        <Header>
+          <span>{datastore.name}</span>
+          <Button
+            variant="contained"
+            onClick={() => setOpenAddItemDialog(true)}
+          >
+            Add new item
+          </Button>
+        </Header>
+        <BodyContainer>
+          <TableContainer component={Paper} sx={{ flex: 1 }}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  {fields &&
+                    fields
+                      .filter((i) => i.data_type !== "file")
+                      .map((item) => (
+                        <TableCell key={item.field_id}>{item.title}</TableCell>
+                      ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items &&
+                  items.map((item) => (
+                    <TableRow
+                      key={item.i_id}
+                      hover
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setItemId(item.i_id);
+                        setOpenUpdateItemModal(true);
+                      }}
+                    >
+                      {fields &&
+                        fields
+                          .filter((i) => i.data_type !== "file")
+                          .map((field) => (
+                            <TableCell key={field.field_id}>
+                              {item[field.field_id]}
+                            </TableCell>
+                          ))}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </BodyContainer>
+        {datastore && fields && (
+          <UpdateItem
+            open={openUpdateItemModal}
+            fields={fields}
+            selectedItemId={itemId}
+            setOpen={setOpenUpdateItemModal}
+            datastore={datastore}
+            projectId={projectId}
+            action={action}
+            setAction={setAction}
+            getItems={getItems}
+          />
+        )}
+        <AddItem
+          datastoreId={datastore_id}
           fields={fields}
+          open={openAddItemDialog}
+          setOpen={setOpenAddItemDialog}
           selectedItemId={itemId}
-          setOpen={setOpenUpdateItemModal}
-          datastore={datastore}
           projectId={projectId}
-          action={action}
+          getItems={getItems}
         />
-      )}
-    </Wrapper>
-  );
+      </Wrapper>
+    );
+  }
 };
 
-export default React.memo(Item);
+export default Item;

@@ -9,6 +9,8 @@ export const itemService = {
   getItemDetail,
   getFields,
   updateItem,
+  create,
+  createItemId,
 };
 
 async function getItems(datastoreId, projectId, getItemsParameters) {
@@ -52,4 +54,23 @@ async function updateItem(projectId, datastoreId, itemId, payload) {
     payload
   );
   return data;
+}
+
+async function create(projectId, datastoreId, newItemPl) {
+  console.log(newItemPl);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const hexabase = await createClient({ url: baseUrl, token: user.token });
+  const { itemNew, error } = await hexabase.items.create(
+    projectId,
+    datastoreId,
+    newItemPl
+  );
+  return itemNew;
+}
+
+async function createItemId(datastoreId) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const hexabase = await createClient({ url: baseUrl, token: user.token });
+  const { item_id, error } = await hexabase.items.createItemId(datastoreId);
+  return item_id;
 }

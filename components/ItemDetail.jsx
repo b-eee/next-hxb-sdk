@@ -41,7 +41,6 @@ export default function ItemDetail(props) {
   const [value, setValue] = useState(0);
   const [files, setFiles] = useState([]);
   const [selectedFieldId, setSelectedFieldId] = useState(null);
-  const [fileChange, setFileChange] = useState();
 
   let changesParams = [];
 

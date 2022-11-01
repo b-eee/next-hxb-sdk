@@ -9,7 +9,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { appService } from "../../services";
 import { Spinner } from "..";
 import {
+  Backdrop,
   Box,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -18,8 +20,8 @@ import {
   Stack,
   Tab,
   Tabs,
-  Typography,
 } from "@mui/material";
+import styled from "@emotion/styled";
 import PropTypes from "prop-types";
 
 function a11yProps(index) {
@@ -42,7 +44,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          <span>{children}</span>
         </Box>
       )}
     </div>
@@ -76,8 +78,10 @@ export default function AddProject({
   };
 
   useEffect(() => {
-    getTemplates();
-  }, []);
+    if (open) {
+      getTemplates();
+    }
+  }, [open]);
 
   const handleClose = () => {
     setOpen(false);
@@ -155,20 +159,25 @@ export default function AddProject({
                     {templates &&
                       templates.categories &&
                       templates.categories.map((category, index) => (
-                        <TabPanel value={value} index={index}>
+                        <TabPanel
+                          value={value}
+                          key={category.category}
+                          index={index}
+                        >
                           <FormControl>
                             {category.templates.map((temp) => (
                               <Stack
                                 direction="row"
                                 spacing={6}
                                 alignItems="center"
+                                key={temp.tp_id}
                               >
                                 <FormControlLabel
                                   value={temp.tp_id}
                                   control={<Radio />}
                                   label={temp.name}
                                 />
-                                <Typography>{temp.description}</Typography>
+                                <span>{temp.description}</span>
                               </Stack>
                             ))}
                           </FormControl>

@@ -11,6 +11,7 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import {
   Box,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -20,6 +21,8 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import { Spinner } from "../../components";
+import AddWorkspace from "../../components/modals/AddWorkspace";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -90,6 +93,8 @@ function Workspaces() {
   const [appDs, setAppDs] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [loadingWs, setLoadingWs] = useState(false);
+  const [openAddWsModal, setOpenAddWsModal] = useState(false);
 
   const getAppAndDsData = async (id) => {
     const appAndDs = await appService.getAppAndDs(id);
@@ -100,9 +105,11 @@ function Workspaces() {
   };
 
   const getWorkspaces = async () => {
+    setLoadingWs(true);
     const resWorkspaces = await workspaceService.getWorkspaces();
     setWorkspaces(resWorkspaces.workspaces);
     setWsCurrent(resWorkspaces.current_workspace_id);
+    setLoadingWs(false);
   };
 
   const resetWorkspace = async (wid) => {
@@ -141,79 +148,87 @@ function Workspaces() {
     getAppAndDsData(wsCurrent);
   }, [wsCurrent]);
 
-  return (
-    <div className="card">
-      <h4 className="card-header">Application in workspace</h4>
-      <div className="current-id-ws">
-        <div>
-          <span> workspace:</span>
-          <select
-            value={workspaces?.current_workspace_id}
-            onChange={(e) => handleChange(e)}
-          >
-            {workspaces &&
-              workspaces &&
-              workspaces.map((ws) => {
-                return (
-                  <option value={ws.workspace_id}> {ws.workspace_name}</option>
-                );
-              })}
-          </select>
-        </div>
-      </div>
-      <hr />
-      <div>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-            {appDs && (
-              <TableBody>
-                {(rowsPerPage > 0
-                  ? workspaces?.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                  : workspaces
-                )?.map((workspace) => (
-                  <TableRow
-                    key={workspace.workspace_id}
-                    hover
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <Link href={`/workspaces/${workspace.workspace_id}`}>
-                      <TableCell component="th" scope="row">
-                        {workspace.workspace_name}
-                      </TableCell>
-                    </Link>
-                  </TableRow>
-                ))}
-              </TableBody>
-            )}
+  if (loadingWs) {
+    return <Spinner />;
+  } else {
+    return (
+      <>
+        <div className="card">
+          <h4 className="card-header">Workspaces</h4>
+          <div>
+            <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 500 }}
+                aria-label="custom pagination table"
+              >
+                {appDs && (
+                  <TableBody>
+                    {(rowsPerPage > 0
+                      ? workspaces?.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                      : workspaces
+                    )?.map((workspace) => (
+                      <TableRow
+                        key={workspace.workspace_id}
+                        hover
+                        sx={{ cursor: "pointer" }}
+                      >
+                        <Link href={`/workspaces/${workspace.workspace_id}`}>
+                          <TableCell component="th" scope="row">
+                            {workspace.workspace_name}
+                          </TableCell>
+                        </Link>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
 
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={3}
-                  count={workspaces?.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    inputProps: {
-                      "aria-label": "rows per page",
-                    },
-                    native: true,
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      </div>
-    </div>
-  );
+                <TableFooter>
+                  <TableRow>
+                    <TablePagination
+                      rowsPerPageOptions={[
+                        5,
+                        10,
+                        25,
+                        { label: "All", value: -1 },
+                      ]}
+                      colSpan={3}
+                      count={workspaces?.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        inputProps: {
+                          "aria-label": "rows per page",
+                        },
+                        native: true,
+                      }}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActions}
+                    />
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </TableContainer>
+          </div>
+        </div>
+        <Button
+          variant="contained"
+          sx={{ mt: 2 }}
+          onClick={() => setOpenAddWsModal(true)}
+        >
+          Add Workspace
+        </Button>
+        <AddWorkspace
+          open={openAddWsModal}
+          setOpen={setOpenAddWsModal}
+          getWorkspaces={getWorkspaces}
+        />
+      </>
+    );
+  }
 }
 
 export default Workspaces;

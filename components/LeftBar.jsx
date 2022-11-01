@@ -2,6 +2,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { userService } from "../services";
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import WorkIcon from "@mui/icons-material/Work";
 
 export { LeftBar };
 
@@ -26,7 +34,7 @@ function LeftBar() {
       <div className="left-main-top"></div>
       <hr className="left-main-hr" />
       <nav className="left-main-nav">
-        <div className="left-item">
+        {/* <div className="left-item">
           <div className="left-svg-boby">
             <svg
               className="svg-item"
@@ -43,7 +51,19 @@ function LeftBar() {
               <Link href={`${url}/workspaces`}>Workspace</Link>
             </span>
           </div>
-        </div>
+        </div> */}
+        <List>
+          <Link href={`${url}/workspaces`}>
+            <ListItem>
+              <ListItemButton>
+                <ListItemIcon>
+                  <WorkIcon />
+                </ListItemIcon>
+                <ListItemText primary="Workspace" />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+        </List>
       </nav>
     </div>
   );

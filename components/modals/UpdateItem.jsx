@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
   Grid,
@@ -21,6 +22,7 @@ import {
 import { itemService } from "../../services/item.service";
 import { storageService } from "../../services/storage.service";
 import { datastoreService } from "../../services/datastore.service";
+import { Spinner } from "..";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -34,11 +36,14 @@ export default function UpdateItem({
   selectedItemId,
   fields,
   action,
+  getItems,
 }) {
   const [fieldValues, setFieldValues] = useState();
   const [itemDetail, setItemDetail] = useState();
   const [updateItemChanges, setUpdateItemChanges] = useState([]);
-  const [filesUpload, setFilesUpload] = useState([]);
+  const [tempFiles, setTempFiles] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
+  const [loadingUploadFile, setLoadingUploadFile] = useState(false);
 
   const { datastore_id } = datastore;
 
@@ -56,12 +61,14 @@ export default function UpdateItem({
       include_linked_items: true,
     };
 
+    setLoadingData(true);
     const res = await itemService.getItemDetail(
       datastore_id,
       selectedItemId,
       projectId,
       itemDetailParams
     );
+    setLoadingData(false);
 
     let arr;
     if (res && res?.field_values) {
@@ -73,7 +80,14 @@ export default function UpdateItem({
 
   useEffect(() => {
     getItemDetail();
-  }, [selectedItemId]);
+  }, [datastore_id, selectedItemId, projectId]);
+
+  useEffect(() => {
+    const files = fieldValues?.filter((value) => value.dataType === "file");
+    if (files && files[0].value !== null) {
+      setTempFiles(files[0].value);
+    }
+  }, [fieldValues]);
 
   const getUpdateItemChanges = async (
     uploadFieldId,
@@ -146,7 +160,7 @@ export default function UpdateItem({
       };
     }
 
-    setUpdateItemChanges((prevState) => [...prevState, objectChange]);
+    setUpdateItemChanges([...updateItemChanges, objectChange]);
   };
 
   const toBase64 = (file) =>
@@ -158,6 +172,8 @@ export default function UpdateItem({
     });
 
   const handleUploadFile = async (e, fieldId) => {
+    if (e.target.files.length === 0) return;
+    setLoadingUploadFile(true);
     const file = e.target.files[0];
     const uploadFilePayload = {
       filename: file.name,
@@ -173,11 +189,12 @@ export default function UpdateItem({
     const { data } = await storageService.createFile(uploadFilePayload);
     const newFileId = data?.file_id;
     await getUpdateItemChanges(fieldId, newFileId, e);
+    setTempFiles([...tempFiles, data]);
+    setLoadingUploadFile(false);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
     let map = new Map();
 
@@ -187,32 +204,41 @@ export default function UpdateItem({
 
     const arr = Array.from(map.values());
 
-    const updateItemPl = {
-      action_id: action.action_id,
+    await itemService.updateItem(projectId, datastore_id, selectedItemId, {
       changes: arr,
       history: {
-        item_id: selectedItemId,
-        datastore_id,
         comment: "",
+        datastore_id: datastore_id,
+        action_id: action.action_id,
       },
       rev_no: itemDetail.rev_no,
-    };
-
-    console.log({
-      projectId,
-      datastore_id,
-      itemId: selectedItemId,
-      updateItemPl,
     });
 
-    await itemService.updateItem(
-      projectId,
-      datastore_id,
-      selectedItemId,
-      updateItemPl
-    );
-
     setOpen(false);
+    getItemDetail();
+    getItems();
+  };
+
+  const handleDeleteFile = async (fileId) => {
+    if (!fileId) return;
+    setLoadingData(true);
+    await storageService.deleteFile({ fileId });
+    getItemDetail();
+    setLoadingData(false);
+  };
+
+  const handleDownloadFile = async (file) => {
+    // Only work for image file
+    const res = await storageService.getFile(file.file_id);
+    if (!file || !res) return;
+    const formattedRes = `/${res.data.split("/").slice(2).join("/")}`;
+
+    if (res) {
+      let a = document.createElement("a");
+      a.href = `data:${file.contentType};base64,${formattedRes}`; //Image Base64 Goes here
+      a.download = res.filename; //File name Here
+      a.click(); //Downloaded file
+    }
   };
 
   return (
@@ -233,11 +259,8 @@ export default function UpdateItem({
             <CloseIcon />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-            Sound
+            Update Item
           </Typography>
-          <Button autoFocus color="inherit" onClick={handleClose}>
-            save
-          </Button>
         </Toolbar>
       </AppBar>
       <Box
@@ -246,86 +269,103 @@ export default function UpdateItem({
         onSubmit={handleSubmit}
         sx={{ mt: 3, p: 6 }}
       >
-        <Grid container spacing={2}>
-          {fieldValues &&
-            fieldValues
-              .filter(
-                (value) =>
-                  value.dataType !== "status" && value.dataType !== "file"
-              )
-              .map((value) => {
-                return value.field_name === "user_id" ? (
-                  <>
-                    {value.value.map((item) => (
-                      <Grid item xs={12} sm={6} key={item.user_id}>
-                        <InputLabel>{value.field_name}</InputLabel>
-                        <TextField
-                          fullWidth
-                          name={value.field_id}
-                          //   value={item.user_name}
-                          defaultValue={item.user_name}
-                          id={value.field_id}
-                          type="text"
-                          onChange={(e) =>
-                            getUpdateItemChanges(null, null, value.field_id, e)
-                          }
-                        />
-                      </Grid>
-                    ))}
-                  </>
-                ) : (
-                  <Grid item xs={12} sm={6} key={value.field_id}>
+        {loadingData && <Spinner />}
+        {!loadingData && (
+          <Grid container spacing={2}>
+            {fieldValues &&
+              fieldValues
+                .filter(
+                  (value) =>
+                    value.dataType !== "status" && value.dataType !== "file"
+                )
+                .map((value) => {
+                  return value.field_name === "user_id" ? (
+                    <>
+                      {value.value &&
+                        value.value.map((item) => (
+                          <Grid item xs={12} sm={6} key={item.user_id}>
+                            <InputLabel>{value.field_name}</InputLabel>
+                            <TextField
+                              fullWidth
+                              name={value.field_id}
+                              defaultValue={item.user_name}
+                              id={value.field_id}
+                              type="text"
+                              onChange={(e) =>
+                                getUpdateItemChanges(
+                                  null,
+                                  null,
+                                  value.field_id,
+                                  e
+                                )
+                              }
+                            />
+                          </Grid>
+                        ))}
+                    </>
+                  ) : (
+                    <Grid item xs={12} sm={6} key={value.field_id}>
+                      <InputLabel>{value.field_name}</InputLabel>
+                      <TextField
+                        fullWidth
+                        name={value.field_id}
+                        id={value.field_id}
+                        defaultValue={value.value}
+                        onChange={(e) =>
+                          getUpdateItemChanges(null, null, value.field_id, e)
+                        }
+                      />
+                    </Grid>
+                  );
+                })}
+            {fieldValues &&
+              fieldValues
+                .filter((value) => value.dataType === "file")
+                .map((value) => (
+                  <Grid item xs={12} key={value.field_id}>
                     <InputLabel>{value.field_name}</InputLabel>
-                    <TextField
-                      fullWidth
-                      name={value.field_id}
-                      id={value.field_id}
-                      //   value={value.value}
-                      defaultValue={value.value}
-                      onChange={(e) =>
-                        getUpdateItemChanges(null, null, value.field_id, e)
-                      }
-                    />
+                    <LoadingButton
+                      sx={{ textAlign: "right" }}
+                      component="label"
+                      variant="contained"
+                      loading={loadingUploadFile}
+                    >
+                      Upload
+                      <input
+                        hidden
+                        type="file"
+                        onChange={(e) => handleUploadFile(e, value.field_id)}
+                      />
+                    </LoadingButton>
+                    <List sx={{ maxWidth: "max-content" }}>
+                      {tempFiles &&
+                        tempFiles.map((file) => {
+                          return (
+                            <ListItem key={file.file_id}>
+                              <ListItemButton
+                                onClick={() => handleDownloadFile(file)}
+                              >
+                                <ListItemText
+                                  primary={file.filename}
+                                  sx={{ color: "blue" }}
+                                />
+                              </ListItemButton>
+                              <IconButton
+                                onClick={() => handleDeleteFile(file.file_id)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </ListItem>
+                          );
+                        })}
+                    </List>
                   </Grid>
-                );
-              })}
-          {fieldValues &&
-            fieldValues
-              .filter((value) => value.dataType === "file")
-              .map((value) => (
-                <Grid item xs={12} key={value.field_id}>
-                  <InputLabel>{value.field_name}</InputLabel>
-                  <Button sx={{ textAlign: "right" }} component="label">
-                    Upload
-                    <input
-                      hidden
-                      multiple
-                      type="file"
-                      onChange={(e) => handleUploadFile(e, value.field_id)}
-                    />
-                  </Button>
-                  <List sx={{ maxWidth: "max-content" }}>
-                    {value.value &&
-                      value.value.map((file) => {
-                        return (
-                          <ListItem key={file.file_id}>
-                            <ListItemButton>
-                              <ListItemText
-                                primary={file.filename}
-                                sx={{ color: "blue" }}
-                              />
-                            </ListItemButton>
-                            <IconButton>
-                              <DeleteIcon />
-                            </IconButton>
-                          </ListItem>
-                        );
-                      })}
-                  </List>
-                </Grid>
-              ))}
-        </Grid>
-        <Button sx={{ mt: 3, mb: 2, mr: 2 }}>Cancel</Button>
+                ))}
+          </Grid>
+        )}
+        <Button sx={{ mt: 3, mb: 2, mr: 2 }} onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
         <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
           Save
         </Button>

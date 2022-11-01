@@ -4,7 +4,7 @@ const baseUrl = `${process.env.URL}`;
 export const storageService = {
   getFile,
   createFile,
-  // deleteFile,
+  deleteFile,
 };
 
 async function createFile(uploadFilePayload) {
@@ -29,8 +29,9 @@ async function getFile(getDownloadFileId) {
 // }
 
 // // get detail datastore_item
-// async function deleteFile(fileId: string) {
-//     const hexabase = await initHxbClient()
-//     const {data, error} = await hexabase.storage.delete(fileId)
-//     return data
-// }
+async function deleteFile(fileId) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const hexabase = await createClient({ url: baseUrl, token: user.token });
+  const { data, error } = await hexabase.storage.delete(fileId);
+  return data;
+}
