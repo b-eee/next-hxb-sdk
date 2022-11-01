@@ -101,19 +101,6 @@ const WorkspaceDetail = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, projects]);
 
-  // const handleSelectProject = (event) => {
-  //   setProjectId(event.target.value);
-  // };
-
-  // const handleButtonClick = () => {
-  //   setOpenCollapse(!openCollapse);
-  // };
-
-  // const handleDsClick = (id) => {
-  //   const res = datastores.filter((ds) => ds.datastore_id === id);
-  //   setSelectedDs(res[0]);
-  // };
-
   if (loadingApp) {
     return (
       <Backdrop

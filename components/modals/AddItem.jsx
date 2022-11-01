@@ -25,10 +25,12 @@ import { itemService } from "../../services";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const getInitialValues = (fields) => {
-  const fieldNames = fields.map((field) => field.field_id);
-  return fieldNames.reduce((a, v) => {
-    return { ...a, [v]: "" };
-  }, {});
+  if (fields) {
+    const fieldNames = fields.map((field) => field.field_id);
+    return fieldNames.reduce((a, v) => {
+      return { ...a, [v]: "" };
+    }, {});
+  }
 };
 
 export default function AddItem({
@@ -71,7 +73,6 @@ export default function AddItem({
           delete values[key];
         }
       });
-      console.log({ values });
       const newItemPl = {
         // need to get this from getActions (TODO: fix later after deployment)
         action_id: "634e76650102df2823294290",
@@ -144,28 +145,29 @@ export default function AddItem({
         <DialogContent>
           <Box>
             <Stack spacing={2} sx={{ paddingTop: "20px" }}>
-              {fields
-                .filter(
-                  (field) =>
-                    field.data_type !== "status" &&
-                    field.data_type !== "users" &&
-                    field.data_type !== "file"
-                )
-                .map((field) => {
-                  return (
-                    <TextField
-                      key={field.field_id}
-                      fullWidth
-                      id={field.field_id}
-                      name={field.field_id}
-                      label={field.title}
-                      value={formik.values.field_id}
-                      onChange={(e) =>
-                        handleInputChange(e, field, formik.setFieldValue)
-                      }
-                    />
-                  );
-                })}
+              {fields &&
+                fields
+                  .filter(
+                    (field) =>
+                      field.data_type !== "status" &&
+                      field.data_type !== "users" &&
+                      field.data_type !== "file"
+                  )
+                  .map((field) => {
+                    return (
+                      <TextField
+                        key={field.field_id}
+                        fullWidth
+                        id={field.field_id}
+                        name={field.field_id}
+                        label={field.title}
+                        value={formik.values.field_id}
+                        onChange={(e) =>
+                          handleInputChange(e, field, formik.setFieldValue)
+                        }
+                      />
+                    );
+                  })}
               {fields
                 .filter((field) => field.data_type === "file")
                 .map((field) => {

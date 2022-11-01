@@ -1,39 +1,74 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { appService } from "../../services/application.service";
 
-export default function EditProject({ open, setOpen }) {
+export default function EditProject({
+  open,
+  setOpen,
+  projects,
+  projectId,
+  getAppAndDs,
+}) {
+  let curretProjectName = "";
+
+  const [projectName, setProjectName] = useState(curretProjectName);
   const handleClose = () => {
+    setProjectName(curretProjectName);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    if (projects && projectId) {
+      curretProjectName = projects.filter(
+        (project) => project.application_id === projectId
+      )[0].name;
+
+      setProjectName(curretProjectName);
+    }
+  }, [projects, projectId]);
+
+  const handleUpdateProject = async () => {
+    const updatePjParam = {
+      payload: {
+        project_id: projectId,
+        project_name: {
+          en: projectName,
+          ja: projectName,
+        },
+      },
+    };
+    await appService.updateProjectName(updatePjParam);
+    getAppAndDs();
     setOpen(false);
   };
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>Project Settings</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
-          </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            label="Email Address"
-            type="email"
+            label="Project Name"
+            type="text"
             fullWidth
             variant="standard"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Subscribe</Button>
+          <Button onClick={handleUpdateProject} variant="contained">
+            Update
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

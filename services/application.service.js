@@ -10,6 +10,7 @@ export const appService = {
   getTemplates,
   createApp,
   getApplication,
+  updateProjectName,
 };
 
 async function getAppAndDs(id) {
@@ -18,18 +19,6 @@ async function getAppAndDs(id) {
   const { appAndDs, error } =
     await hexabase.applications.getProjectsAndDatastores(id);
   return appAndDs;
-}
-
-//create a workspace
-async function createWorkspace(name) {
-  const createWsInput = {
-    name,
-  };
-  // const hexabase = await initHxbClient()
-  const user = JSON.parse(localStorage.getItem("user"));
-  const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { w_id, error } = await hexabase.workspaces.create(createWsInput);
-  return w_id;
 }
 
 //create project
@@ -56,4 +45,12 @@ async function getApplication(projectId) {
   const hexabase = await createClient({ url: baseUrl, token: user.token });
   const { getApplications, error } = await hexabase.applications.get(projectId);
   return getApplications;
+}
+
+// update project name
+async function updateProjectName(payload) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const hexabase = await createClient({ url: baseUrl, token: user.token });
+  const { data, error } = hexabase.applications.updateProjectName(payload);
+  return data;
 }

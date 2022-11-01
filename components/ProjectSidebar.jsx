@@ -107,6 +107,7 @@ const ProjectSidebar = ({
           <IconButton
             aria-describedby={id}
             onClick={handleClickEditProjectIcon}
+            disabled={!!!projectId}
           >
             <MoreVertIcon />
           </IconButton>
@@ -165,6 +166,9 @@ const ProjectSidebar = ({
       <EditProject
         open={openEditProjectModal}
         setOpen={setOpenEditProjectModal}
+        projects={projects}
+        projectId={projectId}
+        getAppAndDs={getAppAndDs}
       />
     </LeftContainer>
   );
