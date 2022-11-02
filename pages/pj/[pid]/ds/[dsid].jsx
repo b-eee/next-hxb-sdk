@@ -37,6 +37,7 @@ function Items() {
             <tbody>
               {items && items.items && 
                 items.items.map(i => {
+                  // eslint-disable-next-line react/jsx-key
                   return (<tr >
                     <td><Link href={`${url}/ds/${i.d_id}/item/${i.i_id}`}>{i.title ? i.title : i.i_id}</Link></td>
                     <td>{i.i_id}</td>

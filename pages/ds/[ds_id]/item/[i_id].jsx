@@ -18,7 +18,6 @@ function ItemDetail() {
     useEffect( () => {
       getItemDetail(ds_id, i_id)
     }, []);
-    console.log("item", item);
     return (
       <div className="card">
         <h4 className="card-header">Item Detail</h4>
@@ -38,24 +37,28 @@ function ItemDetail() {
                 <tr >
                     <td>{item.title}</td>
                     <td>{item.field_values && item.field_values.map(fv => {
+                      // eslint-disable-next-line react/jsx-key
                       return (<ul>
                         <li>{fv.field_name}</li>
                       </ul>)
                     })}
                     </td>
                     <td>{item.item_actions && item.item_actions.map(ia=> {
+                      // eslint-disable-next-line react/jsx-key
                       return (<ul>
                         <li>{ia.action_name}</li>
                       </ul>)
                     })}
                     </td>
                     <td>{item.status_actions && item.status_actions.map(sa=> {
+                      // eslint-disable-next-line react/jsx-key
                       return (<ul>
                         <li>{sa.action_name}</li>
                       </ul>)
                     })}
                     </td>
                     <td>{item.status_list && item.status_list.map(sl=> {
+                      // eslint-disable-next-line react/jsx-key
                       return (<ul>
                         <li>{sl.status_name}</li>
                       </ul>)
