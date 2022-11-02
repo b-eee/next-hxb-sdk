@@ -1,9 +1,15 @@
+import { Backdrop, CircularProgress } from "@mui/material";
+
 export { Spinner };
 
 function Spinner() {
-    return (
-        <div className="text-center p-3">
-            <span className="spinner-border spinner-border-lg align-center"></span>
-        </div>
-    );
+  return (
+    <Backdrop
+      sx={{ color: "#fff", zIndex: 1201 }}
+      open={open}
+      onClick={() => null}
+    >
+      <CircularProgress color="inherit" />
+    </Backdrop>
+  );
 }
