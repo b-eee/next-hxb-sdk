@@ -1,9 +1,7 @@
-import { BehaviorSubject } from "rxjs";
-import getConfig from "next/config";
-import Router from "next/router";
 import { createClient } from "@hexabase/hexabase-js";
 
 const baseUrl = `${process.env.URL}`;
+
 export const workspaceService = {
   getWorkspaces,
   setWorkspace,
