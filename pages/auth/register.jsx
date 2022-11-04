@@ -4,8 +4,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
 import { Link } from '../../components';
-import { Layout } from 'components/account';
-import { userService, alertService } from 'services';
+import { Layout } from '../../components/account/Layout';
+import { userService, alertService } from '../../services';
 
 export default Register;
 
