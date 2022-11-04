@@ -213,10 +213,10 @@ export default function UpdateItem({
       },
       rev_no: itemDetail.rev_no,
     });
+    await getItemDetail();
+    await getItems();
 
     setOpen(false);
-    getItemDetail();
-    getItems();
   };
 
   const handleDeleteFile = async (fileId) => {

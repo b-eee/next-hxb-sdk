@@ -122,6 +122,7 @@ const WorkspaceDetail = (props) => {
             setProjectId={setProjectId}
             setSelectedDs={setSelectedDs}
             getAppAndDs={getAppAndDs}
+            setIsChange={setIsChange}
           />
           <RightContainer>
             {selectedDs && (

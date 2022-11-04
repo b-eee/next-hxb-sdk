@@ -4,14 +4,11 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { appService } from "../../services";
 import { Spinner } from "..";
 import {
-  Backdrop,
   Box,
-  CircularProgress,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -21,7 +18,6 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
-import styled from "@emotion/styled";
 import PropTypes from "prop-types";
 
 function a11yProps(index) {
@@ -66,6 +62,7 @@ export default function AddProject({
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(0);
+  const [projectName, setProjectName] = useState("");
 
   const getTemplates = async () => {
     setLoading(true);
@@ -91,9 +88,14 @@ export default function AddProject({
     setValue(newValue);
   };
 
-  const handleSubmit = (event) => {
+  const handleChangePrName = (e) => {
+    setProjectName(e.target.value);
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    if (data.get("projectName") === "") return;
     const createProjectPl = {
       name: {
         en: data.get("projectName"),
@@ -101,9 +103,9 @@ export default function AddProject({
       },
       tp_id: data.get("templates"),
     };
-    appService.createApp(createProjectPl);
+    await appService.createApp(createProjectPl);
     setIsChange(true);
-    getAppAndDs();
+    await getAppAndDs();
     setOpen(false);
   };
 
@@ -126,6 +128,7 @@ export default function AddProject({
                   type="text"
                   fullWidth
                   variant="standard"
+                  onChange={(e) => handleChangePrName(e)}
                 />
               </FormControl>
               <FormControl>
@@ -190,7 +193,7 @@ export default function AddProject({
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={!!!projectName}>
               Add Project
             </Button>
           </DialogActions>
