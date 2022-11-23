@@ -16,7 +16,7 @@ export const itemService = {
 async function getItems(datastoreId, projectId, getItemsParameters) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { dsItems, error } = await hexabase.items.get(
+  const { dsItems, error } = await hexabase.item.get(
     getItemsParameters,
     datastoreId,
     projectId
@@ -27,7 +27,7 @@ async function getItems(datastoreId, projectId, getItemsParameters) {
 async function getItemDetail(datastoreId, itemId) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { itemDetails, error } = await hexabase.items.getItemDetail(
+  const { itemDetails, error } = await hexabase.item.getItemDetail(
     datastoreId,
     itemId
   );
@@ -37,7 +37,7 @@ async function getItemDetail(datastoreId, itemId) {
 async function getFields(datastoreId, projectId) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { dsFields, error } = await hexabase.datastores.getFields(
+  const { dsFields, error } = await hexabase.datastore.getFields(
     datastoreId,
     projectId
   );
@@ -47,7 +47,7 @@ async function getFields(datastoreId, projectId) {
 async function updateItem(projectId, datastoreId, itemId, payload) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { data, error } = await hexabase.items.update(
+  const { data, error } = await hexabase.item.update(
     projectId,
     datastoreId,
     itemId,
@@ -60,7 +60,7 @@ async function create(projectId, datastoreId, newItemPl) {
   console.log(newItemPl);
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { itemNew, error } = await hexabase.items.create(
+  const { itemNew, error } = await hexabase.item.create(
     projectId,
     datastoreId,
     newItemPl
@@ -71,6 +71,6 @@ async function create(projectId, datastoreId, newItemPl) {
 async function createItemId(datastoreId) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { item_id, error } = await hexabase.items.createItemId(datastoreId);
+  const { item_id, error } = await hexabase.item.createItemId(datastoreId);
   return item_id;
 }
