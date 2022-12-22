@@ -51,6 +51,6 @@ async function getApplication(projectId) {
 async function updateProjectName(payload) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { data, error } = hexabase.project.updateProjectName(payload);
+  const { data, error } = await hexabase.project.updateProjectName(payload);
   return data;
 }
