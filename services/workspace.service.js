@@ -12,7 +12,7 @@ export const workspaceService = {
 async function getWorkspaces() {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { workspaces, error } = await hexabase.workspaces.get();
+  const { workspaces, error } = await hexabase.workspace.get();
   return workspaces;
 }
 
@@ -23,7 +23,7 @@ async function setWorkspace(id) {
     workspace_id: id,
   };
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { data, error } = await hexabase.workspaces.setCurrent(setCurrentWsPl);
+  const { data, error } = await hexabase.workspace.setCurrent(setCurrentWsPl);
   return data;
 }
 
@@ -31,6 +31,6 @@ async function setWorkspace(id) {
 async function createWorkspace(name) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { w_id, error } = await hexabase.workspaces.create(name);
+  const { w_id, error } = await hexabase.workspace.create(name);
   return w_id;
 }

@@ -22,7 +22,7 @@ async function initHxbClient() {
 
 async function getFields(datastoreId, projectId) {
   const hexabase = await initHxbClient();
-  const { dsFields, error } = await hexabase.datastores.getFields(
+  const { dsFields, error } = await hexabase.datastore.getFields(
     datastoreId,
     projectId
   );
@@ -31,7 +31,7 @@ async function getFields(datastoreId, projectId) {
 
 async function getDetail(datastoreId) {
   const hexabase = await initHxbClient();
-  const { datastoreSetting, error } = await hexabase.datastores.getDetail(
+  const { datastoreSetting, error } = await hexabase.datastore.getDetail(
     datastoreId
   );
   return datastoreSetting;
@@ -39,7 +39,7 @@ async function getDetail(datastoreId) {
 
 async function getField(fieldId, datastoreId) {
   const hexabase = await initHxbClient();
-  const { dsField, error } = await hexabase.datastores.getField(
+  const { dsField, error } = await hexabase.datastore.getField(
     fieldId,
     datastoreId
   );
@@ -48,7 +48,7 @@ async function getField(fieldId, datastoreId) {
 
 async function getActions(datastoreId) {
   const hexabase = await initHxbClient();
-  const { dsActions, error } = await hexabase.datastores.getActions(
+  const { dsActions, error } = await hexabase.datastore.getActions(
     datastoreId
   );
   return dsActions;
@@ -56,7 +56,7 @@ async function getActions(datastoreId) {
 
 async function getStatuses(datastoreId) {
   const hexabase = await initHxbClient();
-  const { dsStatuses, error } = await hexabase.datastores.getStatuses(
+  const { dsStatuses, error } = await hexabase.datastore.getStatuses(
     datastoreId
   );
   return dsStatuses;
