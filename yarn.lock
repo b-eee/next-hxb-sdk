@@ -194,10 +194,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@hexabase/hexabase-js@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.npmjs.org/@hexabase/hexabase-js/-/hexabase-js-1.0.18.tgz"
-  integrity sha512-UeaPOxfKW5wJ9RhFMiqdCWlUzUNm4I2eI96V7loL2ZyAFVQvf9e3ZXjN/CuDPDHlyQUxH4Va0fdZ/7FJBEf6Dw==
+"@hexabase/hexabase-js@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@hexabase/hexabase-js/-/hexabase-js-1.1.1.tgz#391e96b1ac35967ad15c55dc702e975768115d31"
+  integrity sha512-ZmNKLlTN9VlAUymae4r/orS3A/IsNsxwj3xVsxzH3GOGgLjpw6rpEk3AX9nSdY/jh2LM2loEQp0JVoa5I8H1pw==
   dependencies:
     dotenv "^16.0.0"
     graphql-request "^4.2.0"

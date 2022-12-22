@@ -17,7 +17,7 @@ async function getAppAndDs(id) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
   const { appAndDs, error } =
-    await hexabase.applications.getProjectsAndDatastores(id);
+    await hexabase.project.getProjectsAndDatastores(id);
   return appAndDs;
 }
 
@@ -25,7 +25,7 @@ async function getAppAndDs(id) {
 async function createApp(createProjectParams) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { app, error } = await hexabase.applications.create(
+  const { app, error } = await hexabase.project.create(
     createProjectParams
   );
   return app?.project_id;
@@ -35,7 +35,7 @@ async function createApp(createProjectParams) {
 async function getTemplates() {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { getTemplates, error } = await hexabase.applications.getTemplates();
+  const { getTemplates, error } = await hexabase.project.getTemplates();
   return getTemplates;
 }
 
@@ -43,7 +43,7 @@ async function getTemplates() {
 async function getApplication(projectId) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { getApplications, error } = await hexabase.applications.get(projectId);
+  const { getApplications, error } = await hexabase.project.get(projectId);
   return getApplications;
 }
 
@@ -51,6 +51,6 @@ async function getApplication(projectId) {
 async function updateProjectName(payload) {
   const user = JSON.parse(localStorage.getItem("user"));
   const hexabase = await createClient({ url: baseUrl, token: user.token });
-  const { data, error } = hexabase.applications.updateProjectName(payload);
+  const { data, error } = await hexabase.project.updateProjectName(payload);
   return data;
 }
