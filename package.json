@@ -15,7 +15,7 @@
     "@hookform/resolvers": "^2.8.8",
     "@mui/icons-material": "^5.10.9",
     "@mui/lab": "^5.0.0-alpha.105",
-    "@mui/material": "^5.10.11",
+    "@mui/material": "^5.14.0",
     "formik": "^2.2.9",
     "next": "12.1.4",
     "prop-types": "^15.8.1",
